@@ -1,6 +1,8 @@
 # BruteForceOTP.py
 Brute Force 6 digit OTP;  
 
+This code does not work, is a work in progress.
+
 Used for Brute Forcing a 6 digit OTP; 
 
 If you use this code, you acknowledge and affirm to the following: 
