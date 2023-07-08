@@ -1,0 +1,5 @@
+Execution:
+
+Grant the file the proper permissions...example "chmod 777 'filename'"
+
+Simply run the command "python3 'filename'" on your attack machine
