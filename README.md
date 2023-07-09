@@ -1,5 +1,5 @@
 # BruteForceOTP.py
-Brute Force 6 digit OTP;  
+Brute Force 6 digit OTP and create a log of the Brute Force in the same directory the code runs in.  
 
 This code does not work, is a work in progress.
 
